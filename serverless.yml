@@ -1,0 +1,75 @@
+org: ahummel
+app: weather-api
+service:
+  name: weather-api
+
+package:
+  individually: true
+
+plugins:
+  - serverless-stage-manager
+  - serverless-plugin-typescript
+  - serverless-plugin-warmup
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: nodejs12.x
+  stage: ${opt:stage,'dev'}
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    WEATHER_API_KEY: ${self:custom.weatherApiKey.${self:provider.stage}}
+  vpc:
+    securityGroupIds:
+      - sg-0cceca28be5c2774b
+    subnetIds:
+      - subnet-0bc62bce21a2be313
+      - subnet-0a5eb360924eb0738
+      - subnet-0f6c1b730eec0e689
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "lambda:AddPermission"
+        - "lambda:InvokeFunction"
+        - "lambda:RemovePermission"
+      Resource:
+        - Fn::Join:
+            - ":"
+            - - arn:aws:lambda
+              - Ref: AWS::Region
+              - Ref: AWS::AccountId
+              - function:${self:service}-${opt:stage, self:provider.stage}-*
+
+custom:
+  stages:
+    - dev
+    - prod
+  weatherApiKey:
+    dev: ${ssm:/weather-api/dev/WEATHER_API_KEY~true}
+    prod: ${ssm:/weather-api/prod/WEATHER_API_KEY~true}
+
+functions:
+  get-weather:
+    handler: lambda.getWeatherByZip
+    events:
+      - http:
+          method: get
+          path: get-weather
+          request:
+            parameters:
+              querystrings:
+                zipCode: true
+    warmup: true
+
+resources:
+  Resources:
+    ParameterRequestValidator:
+      Type: AWS::ApiGateway::RequestValidator
+      Properties:
+        Name: ParameterRequestValidator
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ValidateRequestBody: false
+        ValidateRequestParameters: true
