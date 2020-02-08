@@ -1,11 +1,12 @@
 import { APIGatewayProxyCallback } from "aws-lambda";
-import rp from "request-promise-native";
+import rp, { RequestPromise } from "request-promise-native";
 
 export const getWeatherByZip = async (
   zipCode: string,
+  units: string = "imperial",
   callback: APIGatewayProxyCallback
-): Promise<any> => {
-  const url = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode},us&appid=${process.env.WEATHER_API_KEY}`;
+): Promise<RequestPromise> => {
+  const url = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode},us&appid=${process.env.WEATHER_API_KEY}&units=${units}`;
 
   try {
     const response = await rp(url);

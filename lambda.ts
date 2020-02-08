@@ -5,6 +5,7 @@ import {
   APIGatewayProxyResult,
   Context
 } from "aws-lambda";
+import statusCode from "http-status";
 
 import { getWeatherByZip as getWeather } from "./src/services/weather";
 
@@ -15,7 +16,7 @@ export const getWeatherByZip: APIGatewayProxyHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   if (!event.queryStringParameters) {
     const callbackResponse = {
-      statusCode: 400,
+      statusCode: statusCode.BAD_REQUEST,
       body: JSON.stringify({
         message: "Zip code query param must be provided! (e.g. ?zipCode=10001)"
       })
@@ -24,12 +25,12 @@ export const getWeatherByZip: APIGatewayProxyHandler = async (
     callback(null, callbackResponse);
   }
 
-  const { zipCode } = event.queryStringParameters;
+  const { zipCode, units } = event.queryStringParameters;
 
-  const results = await getWeather(zipCode, callback);
+  const results = await getWeather(zipCode, units, callback);
 
   const response = {
-    statusCode: 200,
+    statusCode: statusCode.OK,
     body: results
   };
 

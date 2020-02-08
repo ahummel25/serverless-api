@@ -7,11 +7,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "http-status": "^1.4.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.17",
+    "@types/http-status": "^1.1.2",
     "@types/node": "^10.12.18",
     "@types/request": "^2.48.4",
     "@types/request-promise-native": "^1.0.17",
