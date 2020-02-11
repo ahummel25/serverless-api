@@ -1,11 +1,9 @@
-import { APIGatewayProxyCallback } from "aws-lambda";
 import rp, { RequestPromise } from "request-promise-native";
 
 export const getWeatherByZip = async (
   zipCode: string,
-  units: string = "imperial",
-  callback: APIGatewayProxyCallback
-): Promise<RequestPromise> => {
+  units: string = "imperial"
+): Promise<RequestPromise | any> => {
   const url = `https://api.openweathermap.org/data/2.5/weather?zip=${zipCode},us&appid=${process.env.WEATHER_API_KEY}&units=${units}`;
 
   try {
@@ -20,11 +18,9 @@ export const getWeatherByZip = async (
       body = JSON.stringify(error);
     }
 
-    const callbackResponse = {
+    return {
       statusCode: err.statusCode,
       body
     };
-
-    callback(null, callbackResponse);
   }
 };

@@ -21,19 +21,22 @@ provider:
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
     WEATHER_API_KEY: ${self:custom.weatherApiKey.${self:provider.stage}}
-  vpc:
-    securityGroupIds:
-      - sg-0cceca28be5c2774b
-    subnetIds:
-      - subnet-0bc62bce21a2be313
-      - subnet-0a5eb360924eb0738
-      - subnet-0f6c1b730eec0e689
+    vpc:
+      securityGroupIds:
+        - sg-0cceca28be5c2774b
+      subnetIds:
+        - subnet-0bc62bce21a2be313
+        - subnet-0a5eb360924eb0738
+        - subnet-0f6c1b730eec0e689
   iamRoleStatements:
     - Effect: "Allow"
       Action:
         - "lambda:AddPermission"
         - "lambda:InvokeFunction"
         - "lambda:RemovePermission"
+        - "logs:CreateLogGroup"
+        - "logs:CreateLogStream"
+        - "logs:PutLogEvents"
       Resource:
         - Fn::Join:
             - ":"
@@ -52,15 +55,13 @@ custom:
 
 functions:
   get-weather:
+    description: API to get weather by zip code
     handler: lambda.getWeatherByZip
     events:
       - http:
-          method: get
+          method: POST
           path: get-weather
-          request:
-            parameters:
-              querystrings:
-                zipCode: true
+          cors: true
     warmup: true
 
 resources:

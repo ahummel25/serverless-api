@@ -5,34 +5,32 @@ import {
   APIGatewayProxyResult,
   Context
 } from "aws-lambda";
+import { graphql } from "graphql";
 import statusCode from "http-status";
 
-import { getWeatherByZip as getWeather } from "./src/services/weather";
+import schema from "./graphql/schema";
+//import { getWeatherByZip as getWeather } from "./src/services/weather";
 
 export const getWeatherByZip: APIGatewayProxyHandler = async (
   event: APIGatewayEvent,
-  _context: Context,
-  callback: APIGatewayProxyCallback
+  _context: Context
 ): Promise<APIGatewayProxyResult> => {
-  if (!event.queryStringParameters) {
-    const callbackResponse = {
-      statusCode: statusCode.BAD_REQUEST,
-      body: JSON.stringify({
-        message: "Zip code query param must be provided! (e.g. ?zipCode=10001)"
-      })
-    };
+  const parsedRequestBody = event && event.body ? JSON.parse(event.body) : {};
 
-    callback(null, callbackResponse);
+  console.log(parsedRequestBody);
+
+  try {
+    const graphQLResult = await graphql(
+      schema,
+      parsedRequestBody.query,
+      null,
+      null,
+      parsedRequestBody.variables,
+      parsedRequestBody.operationName
+    );
+
+    return { statusCode: statusCode.OK, body: JSON.stringify(graphQLResult) };
+  } catch (error) {
+    throw error;
   }
-
-  const { zipCode, units } = event.queryStringParameters;
-
-  const results = await getWeather(zipCode, units, callback);
-
-  const response = {
-    statusCode: statusCode.OK,
-    body: results
-  };
-
-  return response;
 };

@@ -7,12 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "graphql": "^14.6.0",
     "http-status": "^1.4.2",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.17",
+    "@types/graphql": "^14.5.0",
     "@types/http-status": "^1.1.2",
     "@types/node": "^10.12.18",
     "@types/request": "^2.48.4",
