@@ -17,7 +17,7 @@ const weatherType = new GraphQLObjectType({
 });
 
 const weatherByZipResponseType = new GraphQLObjectType({
-  name: "WeatherResponseType",
+  name: "WeatherByZipResponseType",
   fields: {
     coord: {
       type: new GraphQLObjectType({
@@ -34,7 +34,7 @@ const weatherByZipResponseType = new GraphQLObjectType({
     base: { type: GraphQLString },
     main: {
       type: new GraphQLObjectType({
-        name: "MainWeatherTypeByZip",
+        name: "WeatherTypeByZipMain",
         fields: {
           temp: { type: GraphQLString },
           feels_like: { type: GraphQLString },
